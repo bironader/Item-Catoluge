@@ -2,15 +2,15 @@
 
 how to run it
 ---
-*install python 2.7
-*install virtual box
-*install vagrant
-*clone this repo
-*git bash in this master
-*run vagrant up command
-*run vagrant ssh command
-*change dir to cd/vagrant
-*change dir to cd Menu-item
-*run python main.py command
-*type localhost/port which is 5000 in this project
+1. install python 2.7
+2. install virtual box
+3. install vagrant
+4. clone this repo
+5. git bash in this master
+6. run vagrant up command
+7. run vagrant ssh command
+8. change dir to cd/vagrant
+9. change dir to cd Menu-item
+10. run python main.py command
+11. type localhost/port which is 5000 in this project
 
