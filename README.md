@@ -1,7 +1,7 @@
 # Item Catalog ND Full Web Stack Project
 
-#how to run it
-
+how to run it
+---
 *install python 2.7
 *install virtual box
 *install vagrant
