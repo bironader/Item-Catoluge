@@ -75,8 +75,6 @@ def editMenuItem(restaurant_id, item_id):
             if request.method == 'GET':
                 return render_template('Edit-menu.html', Item=editedItem, restaurant_id=restaurant_id,
                                        state=session['state'])
-
-
             else:
                 name = request.form['name']
                 course = request.form['course']
@@ -89,6 +87,8 @@ def editMenuItem(restaurant_id, item_id):
                 Db.add(editedItem)
                 Db.commit()
                 return redirect(url_for('Items', restaurant_id=restaurant_id))
+        else:
+            return "you can only edit your items"
     else:
         return 'You should login to edit items'
 
@@ -106,6 +106,8 @@ def deleteMenuItem(restaurant_id, item_id):
                 Db.delete(item_delete)
                 Db.commit()
                 return redirect(url_for('Items', restaurant_id=restaurant_id))
+        else:
+            return "you can only delete your items"
 
     else:
         return 'You should login to delete item'
@@ -115,7 +117,7 @@ def deleteMenuItem(restaurant_id, item_id):
 
 @app.route('/signup', methods=['POST', 'GET'])
 def register():
-    if session['state'] is not None:
+    if session['state'] is None:
         if request.method == 'POST':
             name = request.form['name']
             password = request.form['password']
@@ -123,6 +125,7 @@ def register():
             newUser = datastore.User(name=name, password=password, email=email)
             Db.add(newUser)
             Db.commit()
+            session['provider'] ='localauth'
             return redirect(url_for('Restaurants'))
     else:
         return "You already loged in"
@@ -271,7 +274,7 @@ def logout():
             del session['id']
 
 
-        else:
+        elif session['provider'] == 'localauth':
             # local authtication just delete user session
             del session['state']
             del session['username']
