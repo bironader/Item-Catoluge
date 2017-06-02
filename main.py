@@ -68,40 +68,49 @@ def createMenuItem(restaurant_id):
 
 @app.route('/restaurants/<int:restaurant_id>/edit/<int:item_id>', methods=['GET', 'POST'])
 def editMenuItem(restaurant_id, item_id):
-    editedItem = Db.query(datastore.MenuItem).filter_by(id=item_id).one()
 
-    if session['state'] != None and int(editedItem.user_id) == int(session['id']):
-        if request.method == 'GET':
-            return render_template('Edit-menu.html', Item=editedItem, restaurant_id=restaurant_id,
-                                   state=session['state'])
-        elif request.method == 'POST':
-            name = request.form['name']
-            course = request.form['course']
-            price = request.form['price']
-            description = request.form['description']
-            editedItem.name = name
-            editedItem.price = price
-            editedItem.description = description
-            editedItem.course = course
-            Db.add(editedItem)
-            Db.commit()
+    if session['state'] !=None:
+        editedItem = Db.query(datastore.MenuItem).filter_by(id=item_id).one()
+        if int(editedItem.user_id) == int(session['id']):
+            if request.method == 'GET':
+                return render_template('Edit-menu.html', Item=editedItem, restaurant_id=restaurant_id,
+                                       state=session['state'])
 
-            return redirect(url_for('Items', restaurant_id=restaurant_id))
+
+            else:
+                name = request.form['name']
+                course = request.form['course']
+                price = request.form['price']
+                description = request.form['description']
+                editedItem.name = name
+                editedItem.price = price
+                editedItem.description = description
+                editedItem.course = course
+                Db.add(editedItem)
+                Db.commit()
+                return redirect(url_for('Items', restaurant_id=restaurant_id))
+    else:
+        return 'You should login to edit items'
+
 
 
 @app.route('/restaurants/<int:restaurant_id>/delete/<int:item_id>', methods=['GET', 'POST'])
 def deleteMenuItem(restaurant_id, item_id):
-    item_delete = Db.query(datastore.MenuItem).filter_by(id=item_id).one()
-    if session['state'] != None and int(item_delete.user_id) == int(session['id']):
-        if request.method == 'POST':
-            Db.delete(item_delete)
-            Db.commit()
-            return redirect(url_for('Items', restaurant_id=restaurant_id))
-        else:
-            return render_template('Delete-menu.html', restaurant_id=restaurant_id, item_id=item_id,
+    if session['state'] != None:
+        item_delete = Db.query(datastore.MenuItem).filter_by(id=item_id).one()
+        if int(item_delete.user_id) == int(session['id']):
+            if request.method == 'GET':
+                return render_template('Delete-menu.html', restaurant_id=restaurant_id, item_id=item_id,
                                    state=session['state'])
+            else:
+                Db.delete(item_delete)
+                Db.commit()
+                return redirect(url_for('Items', restaurant_id=restaurant_id))
+
     else:
-        return "You should login "
+        return 'You should login to delete item'
+
+
 
 
 @app.route('/signup', methods=['POST', 'GET'])
@@ -133,7 +142,7 @@ def login():
     return redirect(url_for('Restaurants'))
 
 
-@app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/JSON')
+@app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/JSON')
 def menuItemJSON(restaurant_id, menu_id):
     Menu_Item = Db.query(datastore.MenuItem).filter_by(id=menu_id).one()
     return jsonify(Menu_Item=Menu_Item.serialize)
