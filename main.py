@@ -10,6 +10,7 @@ from  flask import session
 from flask import url_for
 from oauth2client.client import flow_from_clientsecrets
 from pip._vendor import requests
+from pyasn1_modules.rfc1902 import Integer
 from sqlalchemy.orm import sessionmaker
 
 import datastore
@@ -39,6 +40,7 @@ def Restaurants():
 def Items(restaurant_id):
     restaurant = Db.query(datastore.Restaurant).filter_by(id=restaurant_id).one()
     items = Db.query(datastore.MenuItem).filter_by(restaurant_id=restaurant.id)
+    print session['id']
     return render_template('Menu-Item.html', items=items, restaurant=restaurant, user_id=session['id'],
                            state=session['state'])
 
@@ -58,6 +60,7 @@ def createMenuItem(restaurant_id):
             price = request.form['price']
             description = request.form['description']
             user_id = session['id']
+            print user_id
             newItem = datastore.MenuItem(user_id=user_id, course=course, name=name, price=price, restaurant=restaurant,
                                          description=description)
             Db.add(newItem)
@@ -196,9 +199,14 @@ def gconnect():
         data = answer.json()
         session['state'] = data['email']
         session['username'] = data['name']
-        session['id'] = data['id']
+        id = int(data['id'])
+        session['id']=id %1000
         session['access_token'] = access_token
         session['provider'] = 'google'
+        print id
+        print session['id']
+
+
         return redirect(url_for('Restaurants'))
 
 
@@ -226,9 +234,12 @@ def fbconnet():
         profile = graph.get_object('me', **args)
         session['state'] = profile['email']
         session['username'] = profile['name']
-        session['id'] = profile['id']
+        id = int(profile['id'])
+        session['id'] = id % 1000   
         session['provider'] = 'facebook'
         session['access_token'] = access_token
+
+
         return redirect(url_for('Restaurants'))
 
         # session['username'] = data["name"]
